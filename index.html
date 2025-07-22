@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Team Laura-Layla</title>
   <style>
     body {
@@ -10,12 +10,14 @@
       color: #fff;
       text-align: center;
       font-family: sans-serif;
+      margin: 0;
+      padding: 20px;
     }
     #wrapper {
       position: relative;
       width: 90vw;
       max-width: 400px;
-      margin: 40px auto;
+      margin: 20px auto;
     }
     #rahmen {
       position: absolute;
@@ -29,7 +31,50 @@
       width: 100%;
       z-index: 1;
     }
+    input[type="file"] {
+      margin-top: 20px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Team Laura-Layla</h1>
+  <div id="wrapper">
+    <img id="bild" src="" alt="Dein Bild">
+    <img id="rahmen" src="rahmen.png" alt="Teamrahmen">
+  </div>
+  <input type="file" accept="image/*" onchange="bildLaden(event)">
+  <br>
+  <button onclick="download()">📥 Herunterladen</button>
+
+  <script>
+    function bildLaden(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('bild').src = e.target.result;
+        }
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function download() {
+      const bild = document.getElementById('wrapper');
+      html2canvas(bild).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'teamlauralayla.png';
+        link.href = canvas.toDataURL();
+        link.click();
+      });
+    }
   </script>
+
+  <!-- HTML2Canvas CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </body>
-</html
+</html>
 
