@@ -1,42 +1,39 @@
-
 <!DOCTYPE html>
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Team Laura_Layla Profilrahmen</title>
   <style>
     body {
-      background-color: #000;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      height: 100vh;
       margin: 0;
+      padding: 20px;
+      background-color: #000;
       color: white;
       font-family: sans-serif;
+      text-align: center;
     }
     h1 {
-      margin: 20px;
-      font-size: 22px;
+      margin-bottom: 20px;
     }
     .frame-container {
       position: relative;
       width: 90vw;
       max-width: 400px;
-      margin-top: 10px;
+      margin: 0 auto;
     }
-    .frame-container img {
+    #uploadedImage {
       width: 100%;
       display: block;
     }
-    .frame-container canvas {
+    #teamFrame {
       position: absolute;
       top: 0;
       left: 0;
+      width: 100%;
+      pointer-events: none;
     }
-    input {
+    .controls {
       margin-top: 20px;
     }
   </style>
@@ -44,36 +41,60 @@
 <body>
   <h1>Füge dein Bild in den Teamrahmen ein!</h1>
   <div class="frame-container">
-    <img id="rahmen" src="rahmen.png" alt="Teamrahmen" />
-    <canvas id="canvas"></canvas>
+    <img id="uploadedImage" src="" alt="Dein Bild" />
+    <img id="teamFrame" src="rahmen.png" alt="Teamrahmen" />
   </div>
-  <input type="file" accept="image/*" id="upload" />
+
+  <div class="controls">
+    <input type="file" id="imageInput" accept="image/*" />
+    <br /><br />
+    <button onclick="downloadImage()">Bild herunterladen</button>
+  </div>
+
+  <canvas id="canvas" style="display:none;"></canvas>
+
   <script>
-    const upload = document.getElementById("upload");
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    const rahmen = document.getElementById("rahmen");
+    const imageInput = document.getElementById('imageInput');
+    const uploadedImage = document.getElementById('uploadedImage');
+    const teamFrame = document.getElementById('teamFrame');
+    const canvas = document.getElementById('canvas');
 
-    function fitCanvas() {
-      canvas.width = rahmen.clientWidth;
-      canvas.height = rahmen.clientHeight;
-    }
-
-    rahmen.onload = () => fitCanvas();
-
-    upload.onchange = (e) => {
+    imageInput.addEventListener('change', function (e) {
       const file = e.target.files[0];
       if (!file) return;
-      const img = new Image();
-      img.onload = () => {
-        fitCanvas();
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // Bild mittig und quadratisch einfügen
-        const size = Math.min(canvas.width, canvas.height);
-        ctx.drawImage(img, (canvas.width - size) / 2, (canvas.height - size) / 2, size, size);
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        uploadedImage.src = event.target.result;
       };
-      img.src = URL.createObjectURL(file);
-    };
+      reader.readAsDataURL(file);
+    });
+
+    function downloadImage() {
+      const width = uploadedImage.clientWidth;
+      const height = uploadedImage.clientHeight;
+
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext('2d');
+
+      const image = new Image();
+      image.src = uploadedImage.src;
+      image.onload = function () {
+        ctx.drawImage(image, 0, 0, width, height);
+
+        const frame = new Image();
+        frame.src = teamFrame.src;
+        frame.onload = function () {
+          ctx.drawImage(frame, 0, 0, width, height);
+          const link = document.createElement('a');
+          link.download = 'team-laura-layla.png';
+          link.href = canvas.toDataURL('image/png');
+          link.click();
+        };
+      };
+    }
   </script>
 </body>
 </html>
+
